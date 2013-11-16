@@ -1,0 +1,165 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,100);
+
+/*--------------------------------------- */
+/* RESET */
+* {
+	box-sizing: border-box;
+	display: block;
+	
+ padding: 0;
+ border: 0;
+ color: inherit;
+}
+
+/*--------------------------------------- */
+/* COLORS */
+/* Fix !important hacks */
+
+.yellow {
+	color: #F5FB8E !important;
+	border-color: #F5FB8E !important;
+}
+
+.red {
+	color: #FA023C !important;
+	border-color: #FA023C !important;
+}
+
+/*--------------------------------------- */
+/* HEADING */
+
+.heading {
+	padding: 5px;
+	text-align: center;
+	border-bottom: 1px solid #fff;
+}
+
+/*--------------------------------------- */
+/* BUTTON */
+
+.btn {
+ width: 100%;
+ margin-bottom: 20px;
+ padding: 10px;
+ cursor: pointer;
+ border: 1px solid #00AEF9;
+ 
+ text-align: center;
+ text-decoration: none;
+ font-size: 32px;
+ font-weight: 100;
+ background-color: #000;
+ color: #00AEF9;
+}
+
+.btn {
+ outline: none;
+}
+
+/*--------------------------------------- */
+/* BASE */
+
+body {
+	background-color: #000;
+}
+
+h1, h2, h3, span, div, p, a, input, button {
+ font-family: Roboto, Helvetica, Arial, sans-serif;
+ color: #fff;
+}
+
+a {
+	margin-top: 5px;
+	text-decoration: none;
+	font-weight: 300;
+	color: #00AEF9;
+}
+
+input {
+	float: right;
+}
+
+h1, h2, h3 {
+	font-weight: 100;
+}
+
+h1 {
+ font-size: 64px;
+}
+
+h2 {
+	font-size: 32px;
+}
+
+h3 {
+ font-size: 16px;
+}
+
+hr {
+	color: #fff;
+	background-color: #fff;
+	height: 1px;
+}
+
+/*--------------------------------------- */
+/* ABOUT */
+
+div.about {
+	float: left;
+	width: 100%;
+}
+
+@media (min-width: 600px) {
+ div.about {
+   width: 300px;
+ }
+}
+
+@media (min-width: 1000px) {
+ div.about {
+   width: 500px;
+ }
+}
+
+/*--------------------------------------- */
+/* SETTINGS */
+
+div.settings {
+	float: right;
+	width: 100%;
+}
+
+@media (min-width: 600px) {
+	div.settings {
+	 width: 300px;
+	}
+}
+
+@media (min-width: 1000px) {
+ div.settings {
+   width: 500px;
+ }
+}
+
+/*--------------------------------------- */
+/* GROUP */
+
+div.group {
+	 margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #fff;
+}
+
+div.group p {
+	padding-bottom: 5px;
+	border-bottom: 1px solid #fff;
+	text-align: center;
+}
+
+div.group span,input {
+	display: inline-block;
+}
+
+div.group span {
+	margin-right: 10px;
+}

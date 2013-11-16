@@ -1,0 +1,16 @@
+*.class
+
+# Package Files
+*.war
+*.ear
+
+# Build
+target/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# OS X
+.DS_Store
