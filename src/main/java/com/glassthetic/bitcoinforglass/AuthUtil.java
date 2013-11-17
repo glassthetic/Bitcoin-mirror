@@ -1,102 +1,147 @@
 package com.glassthetic.bitcoinforglass;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.oauth2.Oauth2;
+import com.google.api.services.oauth2.model.Userinfo;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+
+
 /**
  * A collection of utility functions that simplify common authentication and
  * user identity tasks
  *
- * @author Jenny Murphy - http://google.com/+JennyMurphy
  * @author Mark Fayngersh
  */
-
-import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.http.javanet.NetHttpTransport;
-
-import com.google.api.client.json.jackson2.JacksonFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-
 public class AuthUtil {
-  public static ListableMemoryCredentialStore store = new ListableMemoryCredentialStore();
-  public static final String GLASS_SCOPE = "https://www.googleapis.com/auth/glass.timeline "
-      + "https://www.googleapis.com/auth/userinfo.profile";
   private static final Logger LOG = Logger.getLogger(AuthUtil.class.getSimpleName());
-
+  
+  private static GoogleAuthorizationCodeFlow flow = null;
+  private static final String CLIENTSECRETS_LOCATION = "/client_secrets.json";
+  private static final String REDIRECT_URI = "/oauth2callback";
+  private static final List<String> SCOPES = Arrays.asList(
+      "https://www.googleapis.com/auth/glass.timeline",
+      "https://www.googleapis.com/auth/userinfo.profile");
+  
   /**
-   * Creates and returns a new {@link AuthorizationCodeFlow} for this app.
+   * Creates and returns a new {@link GoogleAuthorizationCodeFlow} for this app.
+   * 
+   * @return {@link GoogleAuthorizationCodeFlow}
+   * @throws IOException
    */
-  public static AuthorizationCodeFlow newAuthorizationCodeFlow() throws IOException {
-    URL resource = AuthUtil.class.getResource("/oauth.properties");
-    File propertiesFile = new File("./src/main/resources/oauth.properties");
-    try {
-      propertiesFile = new File(resource.toURI());
-      //LOG.info("Able to find oauth properties from file.");
-    } catch (URISyntaxException e) {
-      LOG.info(e.toString());
-      LOG.info("Using default source path.");
+  static GoogleAuthorizationCodeFlow getFlow() throws IOException {
+    if (flow == null) {
+      HttpTransport httpTransport = new NetHttpTransport();
+      JsonFactory jsonFactory = new JacksonFactory();
+      Reader reader = new InputStreamReader(AuthUtil.class.getResourceAsStream(CLIENTSECRETS_LOCATION));
+      GoogleClientSecrets clientSecrets =
+          GoogleClientSecrets.load(jsonFactory, reader);
+      flow =
+          new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory, clientSecrets, SCOPES)
+              .setAccessType("offline").setApprovalPrompt("force").build();
     }
-    FileInputStream authPropertiesStream = new FileInputStream(propertiesFile);
-    Properties authProperties = new Properties();
-    authProperties.load(authPropertiesStream);
-
-    String clientId = authProperties.getProperty("client_id");
-    String clientSecret = authProperties.getProperty("client_secret");
-
-    return new GoogleAuthorizationCodeFlow.Builder(new NetHttpTransport(), new JacksonFactory(),
-        clientId, clientSecret, Collections.singleton(GLASS_SCOPE)).setAccessType("offline")
-        .setCredentialStore(store).build();
+    return flow;
   }
 
   /**
-   * Get the current user's ID from the session
+   * Send a request to the UserInfo API to retrieve the user's information.
+   * 
+   * @param credentials {@link GoogleCredential}
+   * @return {@link Userinfo}
+   * @throws IOException 
+   */
+  static Userinfo getUserInfo(GoogleCredential credentials) throws IOException {
+    Oauth2 userInfoService =
+        new Oauth2.Builder(new NetHttpTransport(), new JacksonFactory(), credentials).build();
+    Userinfo userInfo = userInfoService.userinfo().get().execute();
+    return userInfo;
+  }
+  
+  /**
+   * Exchange an authorization code for OAuth2.0 credentials.
+   * 
+   * @param req {@link HttpServletRequest}
+   * @param authorizationCode
+   * @return {@link GoogleCredential}
+   * @throws IOException 
+   */
+  static GoogleCredential exchangeCode(HttpServletRequest req, String authorizationCode)
+      throws IOException { 
+    GoogleAuthorizationCodeFlow flow = getFlow();
+    GoogleTokenResponse response =
+        flow.newTokenRequest(authorizationCode).setRedirectUri(WebUtil.buildUrl(req, REDIRECT_URI)).execute();
+    
+    return createGoogleCredential(response.getAccessToken(), response.getRefreshToken());      
+  }
+  
+  /**
+   * Creates a new {@link GoogleCredential} object from access and refresh tokens
+   * 
+   * @param accessToken
+   * @param refreshToken
+   * @return
+   * @throws IOException
+   */
+  public static GoogleCredential createGoogleCredential(String accessToken, String refreshToken)
+      throws IOException {
+    HttpTransport httpTransport = new NetHttpTransport();
+    JsonFactory jsonFactory = new JacksonFactory();
+    Reader reader = new InputStreamReader(AuthUtil.class.getResourceAsStream(CLIENTSECRETS_LOCATION));
+    GoogleClientSecrets clientSecrets =
+        GoogleClientSecrets.load(jsonFactory, reader);
+    
+    GoogleCredential credentials = new GoogleCredential.Builder()
+    .setJsonFactory(jsonFactory)
+    .setTransport(httpTransport)
+    .setClientSecrets(clientSecrets)
+    .build()
+      .setAccessToken(accessToken)
+      .setRefreshToken(refreshToken);
+    
+    return credentials;
+  }
+  
+  /**
+   * Retrieve the authorization URL.
    *
-   * @return string user id or null if no one is logged in
+   * @param req {@link HttpServletRequest}
+   * @return Authorization URL to redirect the user to.
+   * @throws IOException Unable to load client_secrets.json.
    */
-  public static String getUserId(HttpServletRequest request) {
-    HttpSession session = request.getSession();
-    return (String) session.getAttribute("userId");
+  public static String getAuthorizationUrl(HttpServletRequest req)
+      throws IOException {
+    GoogleAuthorizationCodeRequestUrl urlBuilder =
+        getFlow().newAuthorizationUrl().setRedirectUri(WebUtil.buildUrl(req, REDIRECT_URI));
+    return urlBuilder.build();
   }
-
-  public static void setUserId(HttpServletRequest request, String userId) {
-    HttpSession session = request.getSession();
-    session.setAttribute("userId", userId);
-  }
-
-  public static void clearUserId(HttpServletRequest request) throws IOException {
-    // Delete the credential in the credential store
-    String userId = getUserId(request);
-    store.delete(userId, getCredential(userId));
-
-    // Remove their ID from the local session
-    request.getSession().removeAttribute("userId");
-  }
-
-  public static Credential getCredential(String userId) throws IOException {
-    if (userId == null) {
-      return null;
-    } else {
-      return AuthUtil.newAuthorizationCodeFlow().loadCredential(userId);
-    }
-  }
-
-  public static Credential getCredential(HttpServletRequest req) throws IOException {
-    return AuthUtil.newAuthorizationCodeFlow().loadCredential(getUserId(req));
-  }
-
-  public static List<String> getAllUserIds() {
-    return store.listAllUsers();
+  
+  /**
+   * Creates a new User
+   * 
+   * @param req {@link HttpServletRequest}
+   * @param authorizationCode
+   * @return {@link User}
+   * @throws IOException 
+   */
+  public static User createUser(HttpServletRequest req, String authorizationCode)
+      throws IOException {
+    GoogleCredential credentials = exchangeCode(req, authorizationCode);
+    Userinfo userInfo = getUserInfo(credentials);
+    User user = User.createUser(userInfo, credentials);
+    return user;
   }
 }

@@ -20,7 +20,7 @@
     </div>
     
     <div class="settings">
-			   <% if (AuthUtil.getUserId(request) != null) { %>
+			   <% if (request.getSession().getAttribute("user_id") != null) { %>
 			     <h2 class="heading">Settings</h2>
 				    
 				    <div class="group">
