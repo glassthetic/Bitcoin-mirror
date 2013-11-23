@@ -1,10 +1,12 @@
-package com.glassthetic.bitcoinforglass;
+package com.glassthetic.bitcoinmirror;
 
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.servlet.http.*;
+
+import com.google.inject.Singleton;
 
 
 /**
@@ -13,6 +15,7 @@ import javax.servlet.http.*;
  * @author Mark Fayngersh - http://google.com/+MarkFayngersh
  */
 @SuppressWarnings("serial")
+@Singleton
 public class AuthServlet extends HttpServlet {
   private static final Logger LOG = Logger.getLogger(AuthServlet.class.getSimpleName());
   
@@ -26,9 +29,7 @@ public class AuthServlet extends HttpServlet {
       
       User user = AuthUtil.createUser(req, code);
       
-      if (user != null) {
-        LOG.info("Successfully created user: " + user.name);
-        
+      if (user != null) {        
         // Bootstrap user if first time
         if (!user.bootstrapped)
           BootstrapUser.bootstrapUser(user);

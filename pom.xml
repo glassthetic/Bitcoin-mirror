@@ -7,7 +7,7 @@
   <version>0.1-SNAPSHOT</version>
 
   <groupId>com.glassthetic</groupId>
-  <artifactId>bitcoin-for-glass</artifactId>
+  <artifactId>bitcoin-mirror</artifactId>
 
   <properties>
     <appengine.app.version>1</appengine.app.version>
@@ -45,11 +45,6 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.googlecode.objectify</groupId>
-      <artifactId>objectify</artifactId>
-      <version>4.0b3</version>
-    </dependency>
 
     <!-- everything else -->
     <dependency>
@@ -57,6 +52,21 @@
       <artifactId>guava</artifactId>
       <version>14.0.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.googlecode.objectify</groupId>
+      <artifactId>objectify</artifactId>
+      <version>4.0b3</version>
+    </dependency>
+    <dependency>
+		    <groupId>com.google.inject</groupId>
+		    <artifactId>guice</artifactId>
+		    <version>4.0-beta</version>
+				</dependency>
+    <dependency>
+		    <groupId>com.google.inject.extensions</groupId>
+		    <artifactId>guice-servlet</artifactId>
+		    <version>4.0-beta</version>
+				</dependency>
   </dependencies>
 
   <build>

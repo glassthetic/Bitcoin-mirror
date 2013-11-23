@@ -1,6 +1,6 @@
-package com.glassthetic.bitcoinforglass;
+package com.glassthetic.bitcoinmirror;
 
-import static com.glassthetic.bitcoinforglass.OfyService.ofy;
+import static com.glassthetic.bitcoinmirror.OfyService.ofy;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +29,8 @@ public class BootstrapUser {
     MirrorClient.insertTimelineItem(user.credentials, btcCard);
     
     user.bootstrapped = true;
-    ofy().save().entity(user).now();      
+    ofy().save().entity(user).now();
+    
+    LOG.info("Bootstrapped user '" + user.name + "' with new card: " + btcCard.toPrettyString());
   }
 }

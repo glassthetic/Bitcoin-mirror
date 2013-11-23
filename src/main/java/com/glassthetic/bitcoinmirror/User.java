@@ -1,6 +1,6 @@
-package com.glassthetic.bitcoinforglass;
+package com.glassthetic.bitcoinmirror;
 
-import static com.glassthetic.bitcoinforglass.OfyService.ofy;
+import static com.glassthetic.bitcoinmirror.OfyService.ofy;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -74,7 +74,7 @@ public class User {
   }
   
   /**
-   * Creates new User in the Datastore, or updates existing one.
+   * Creates new User in the Datastore, or updates the credentials of an existing one.
    * 
    * @param userInfo {@link Userinfo}
    * @param credentials {@link GoogleCredential}
@@ -84,10 +84,14 @@ public class User {
     User user = ofy().load().type(User.class).id(userInfo.getId()).now();
     
     if (user != null) {
+      LOG.info("Updating existing user");
+      
       user.accessToken = credentials.getAccessToken();
       user.refreshToken = credentials.getRefreshToken();
       user.credentials = AuthUtil.createGoogleCredential(credentials.getAccessToken(), credentials.getRefreshToken());
     } else {
+      LOG.info("Creating new user");
+      
       user = new User(
         userInfo.getId(),
         userInfo.getName(), 

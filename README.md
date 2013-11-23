@@ -1,6 +1,6 @@
-# Bitcoin for glass
+# Bitcoin mirror
 
-Display latest Bitcoin exchange rate in a "pinnable" timeline card.
+Display latest Bitcoin exchange rate in a "pinnable" timeline card via Mirror API.
 
 ### Setup
 

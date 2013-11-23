@@ -1,4 +1,4 @@
-package com.glassthetic.bitcoinforglass;
+package com.glassthetic.bitcoinmirror;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;

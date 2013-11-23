@@ -1,4 +1,4 @@
-package com.glassthetic.bitcoinforglass;
+package com.glassthetic.bitcoinmirror;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;

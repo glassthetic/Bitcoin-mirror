@@ -1,18 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%@ page import="com.glassthetic.bitcoinforglass.AuthUtil" %>
+<%@ page import="com.glassthetic.bitcoinmirror.AuthUtil" %>
 
 <!doctype html>
 <html>
   <head>
-    <title>Bitcoin for Glass</title>
+    <title>Bitcoin mirror</title>
     
     <link type="text/css" rel="stylesheet" href="/static/stylesheets/main.css" />
   </head>
 
   <body>
     <div class="about">
-		    <h1>Bitcoin for Glass</h1>
+		    <h1>Bitcoin mirror</h1>
 		    <h2>Pin a card displaying the latest Bitcoin exchange rate.</h2>
 		    <h3>Project by glassthetic</h3>
 		    <a href="http://glassthetic.com">Homepage</a>

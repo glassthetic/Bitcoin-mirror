@@ -1,4 +1,4 @@
-package com.glassthetic.bitcoinforglass;
+package com.glassthetic.bitcoinmirror;
 
 import com.google.api.client.http.GenericUrl;
 
